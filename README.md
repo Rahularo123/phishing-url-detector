@@ -6,8 +6,8 @@ static blocklist. Built as a Software Engineering group project.
 
 ## Team
 - **Rahul Arora** — Backend, Machine Learning, project integration
-- **[Teammate 1 name]** — Frontend
-- **[Teammate 2 name]** — Documentation, testing, dashboard support
+- **Rakshat** — Frontend
+- **Madhav** — Documentation, testing, dashboard support
 
 ## Tech Stack
 - **Frontend:** React, Context API, REST calls

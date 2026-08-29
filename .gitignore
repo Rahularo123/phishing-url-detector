@@ -19,3 +19,6 @@ ml/venv/
 # OS/editor files
 .DS_Store
 .vscode/
+
+#dataset 
+ml/data/

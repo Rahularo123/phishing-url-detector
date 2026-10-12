@@ -538,3 +538,148 @@ body {
   outline: 2px solid #39ff88;
   outline-offset: 3px;
 }
+
+/* Demo warning */
+.demo-notice {
+  margin-top: 18px;
+  padding: 11px 12px;
+  border: 1px solid #78601b;
+  border-radius: 8px;
+  background: #211a08;
+  color: #fcd34d;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  text-align: center;
+}
+
+/* Risk meter colors */
+.risk-score-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.risk-meter {
+  margin-top: 16px;
+}
+
+.risk-meter-track {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #202a23;
+  border: 1px solid #304035;
+}
+
+.risk-meter-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
+.risk-meter-fill.safe {
+  background: #39ff88;
+}
+
+.risk-meter-fill.suspicious {
+  background: #fbbf24;
+}
+
+.risk-meter-fill.phishing {
+  background: #ef4444;
+}
+
+.risk-meter p {
+  margin: 8px 0 0;
+  color: #84958a;
+  font-size: 12px;
+}
+
+/* Verdict badges */
+.risk-badge.safe,
+.result-status.safe {
+  color: #86efac;
+  background: #081a10;
+  border-color: #166534;
+}
+
+.risk-badge.suspicious,
+.result-status.suspicious {
+  color: #fcd34d;
+  background: #211a08;
+  border-color: #78601b;
+}
+
+.risk-badge.phishing,
+.result-status.phishing {
+  color: #fca5a5;
+  background: #200b0e;
+  border-color: #7f1d1d;
+}
+
+.result-status {
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px solid;
+  border-radius: 9px;
+  font-weight: 700;
+}
+
+/* Severity badges */
+.severity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.severity-badge .status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.severity-badge.high {
+  color: #f87171;
+}
+
+.severity-badge.high .status-dot {
+  background: #ef4444;
+}
+
+.severity-badge.medium {
+  color: #fbbf24;
+}
+
+.severity-badge.medium .status-dot {
+  background: #fbbf24;
+}
+
+.severity-badge.low {
+  color: #4ade80;
+}
+
+.severity-badge.low .status-dot {
+  background: #39ff88;
+}
+
+.scan-timestamp {
+  color: #84958a;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .risk-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .risk-badge {
+    max-width: 100%;
+  }
+}

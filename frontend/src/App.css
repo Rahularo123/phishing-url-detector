@@ -375,3 +375,166 @@ body {
     transform: translateY(0);
   }
 }
+
+/* Risk score card */
+.risk-card {
+  margin-top: 24px;
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #050806;
+  border: 1px solid #263b2d;
+  border-radius: 12px;
+}
+
+.detail-label {
+  margin: 0 0 8px;
+  color: #94a39a;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.risk-score {
+  margin: 0;
+  color: #f0fdf4;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.risk-score span {
+  color: #718078;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.risk-badge {
+  padding: 9px 12px;
+  color: #fcd34d;
+  background: #211a08;
+  border: 1px solid #78601b;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Detection details */
+.detection-section {
+  margin-top: 28px;
+}
+
+.detection-section h3 {
+  margin: 0 0 14px;
+  color: #e2e8e3;
+  font-size: 17px;
+}
+
+.detection-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid #1b2920;
+  color: #c2cec5;
+  font-size: 14px;
+}
+
+.pending-value {
+  color: #fcd34d;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+@media (max-width: 480px) {
+  .risk-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .detection-row {
+    align-items: flex-start;
+    font-size: 13px;
+  }
+}
+.risk-meter {
+  margin-top: 16px;
+}
+
+.risk-meter-track {
+  height: 8px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #202a23;
+  border: 1px solid #304035;
+}
+
+.risk-meter-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: #39ff88;
+}
+
+.risk-meter p {
+  margin: 8px 0 0;
+  color: #84958a;
+  font-size: 12px;
+}
+
+.pending-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fcd34d;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.pending-dot {
+  background: #fbbf24;
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+}
+
+/* Scan another URL button */
+.scan-again-button {
+  width: 100%;
+  margin-top: 22px;
+  padding: 14px 18px;
+  border: 1px solid #286340;
+  border-radius: 10px;
+  background: #0a1710;
+  color: #39ff88;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.scan-again-button:hover {
+  background: #10281a;
+  border-color: #39ff88;
+  transform: translateY(-1px);
+}
+
+.scan-again-button:focus-visible {
+  outline: 2px solid #39ff88;
+  outline-offset: 3px;
+}

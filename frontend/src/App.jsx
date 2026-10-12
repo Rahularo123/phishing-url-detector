@@ -69,24 +69,86 @@ setScanResult({
             <button className="scan-button" onClick={handleScan}>
               Scan URL
             </button>
-            {scanResult && (
+           
+{scanResult && (
   <section className="result-panel">
     <p className="result-label">SCAN RESULT</p>
 
-    <h2>Demonstration Result</h2>
+    <h2>URL Analysis Report</h2>
 
     <p className="result-url">{scanResult.url}</p>
 
-    <div className="result-status">
-      Awaiting real phishing analysis
+    <div className="risk-card">
+      <div>
+        <p className="detail-label">RISK SCORE</p>
+        <h3 className="risk-score">-- <span>/ 100</span></h3>
+        <div className="risk-meter">
+  <div className="risk-meter-track">
+    <div className="risk-meter-fill" />
+  </div>
+  <p>Waiting for analysis data</p>
+</div>
+      </div>
+
+      <div className="risk-badge">
+        AWAITING ANALYSIS
+      </div>
     </div>
 
+    <div className="result-status">
+      Analysis pending — no verdict available
+    </div>
+
+    <div className="detection-section">
+      <h3>Detection Details</h3>
+
+      
+<div className="detection-row">
+  <span>Domain reputation</span>
+  <span className="pending-value">
+    <span className="status-dot pending-dot" />
+    Pending
+  </span>
+</div>
+</div>
+<div className="detection-row">
+  <span>Suspicious URL patterns</span>
+  <span className="pending-value">
+    <span className="status-dot pending-dot" />
+    Pending
+  </span>
+</div>
+
+<div className="detection-row">
+  <span>Phishing model prediction</span>
+  <span className="pending-value">
+    <span className="status-dot pending-dot" />
+    Pending
+  </span>
+</div>
+
+
     <p className="result-note">
-      This is a demonstration interface. No security verdict
-      has been generated for this URL.
+      This is a demonstration interface. The risk score and
+      detection checks will be populated when the real analysis
+      backend is connected.
     </p>
+    
+<button
+  className="scan-again-button"
+  onClick={() => {
+    setUrl("");
+    setError("");
+    setMessage("");
+    setScanResult(null);
+  }}
+>
+  ← Scan Another URL
+</button>
+
   </section>
 )}
+
           </div>
         </div>
       </main>

@@ -128,7 +128,12 @@ const [history, setHistory] = useState(initialHistory);
       setMessage("URL format is valid. Showing simulated results.");
 
       // Demo only. Not a real phishing assessment.
-      setScanResult(createMockResult(parsedUrl.href));
+  
+      
+const newResult = createMockResult(parsedUrl.href);
+setScanResult(newResult);
+setHistory((previous) => [newResult, ...previous]);
+
     } catch {
       setError("Please enter a valid HTTP or HTTPS URL.");
     }

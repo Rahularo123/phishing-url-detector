@@ -36,6 +36,18 @@ const scanSchema = new mongoose.Schema({
 });
 const Scan = mongoose.model('Scan', scanSchema);
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function isValidHttpUrl(value) {
+  if (typeof value !== 'string' || value.length > 2048) return false;
+  try {
+    const u = new URL(value.trim());
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 
 
 function requireAuth(req, res, next) {
@@ -58,14 +70,27 @@ function requireAuth(req, res, next) {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const body = req.body ?? {};
+    const name = typeof body.name === 'string' ? body.name.trim() : '';
+    const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+    const password = body.password;
+
+    if (!name || name.length > 60) {
+      return res.status(400).json({ error: 'Please enter a valid name' });
+    }
+    if (!EMAIL_REGEX.test(email) || email.length > 254) {
+      return res.status(400).json({ error: 'Please enter a valid email address' });
+    }
+    if (typeof password !== 'string' || password.length < 8 || password.length > 72) {
+      return res.status(400).json({ error: 'Password must be 8 to 72 characters long' });
+    }
 
     const existing = await User.findOne({ email });
     if (existing) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    
+
     const passwordHash = await bcrypt.hash(password, 10);
     const user = new User({ name, email, passwordHash });
     await user.save();
@@ -83,14 +108,20 @@ app.post('/api/auth/register', async (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const body = req.body ?? {};
+    const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+    const password = body.password;
+
+    if (!email || typeof password !== 'string' || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
 
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    
+
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid email or password' });
@@ -109,30 +140,26 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/auth/me', requireAuth, async (req, res) => {
   const user = await User.findById(req.userId);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
   res.json({ id: user._id, name: user.name, email: user.email });
 });
 
-
-
 app.post('/api/scan', requireAuth, async (req, res) => {
   try {
-    const { url } = req.body;
-    if (!url) {
+    const url = req.body?.url;
+    if (!isValidHttpUrl(url)) {
       return res.status(400).json({ error: 'Please enter a valid URL' });
     }
+    const cleanUrl = url.trim();
 
-   
-    const flaskResponse = await axios.post(`${process.env.FLASK_URL}/predict`, { url });
+    const flaskResponse = await axios.post(
+      `${process.env.FLASK_URL}/predict`,
+      { url: cleanUrl },
+      { timeout: 10000 }
+    );
     const { riskScore, verdict, flags } = flaskResponse.data;
 
-   
-    const scan = new Scan({
-      userId: req.userId,
-      url,
-      riskScore,
-      verdict,
-      flags,
-    });
+    const scan = new Scan({ userId: req.userId, url: cleanUrl, riskScore, verdict, flags });
     await scan.save();
 
     res.json({
@@ -145,9 +172,14 @@ app.post('/api/scan', requireAuth, async (req, res) => {
     });
   } catch (err) {
     console.log(err.message);
+    if (axios.isAxiosError(err) && !err.response) {
+      return res.status(503).json({ error: 'Scanning service is unavailable. Please try again later.' });
+    }
     res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 });
+
+
 
 
 app.get('/api/history', requireAuth, async (req, res) => {
@@ -165,6 +197,10 @@ app.get('/api/history', requireAuth, async (req, res) => {
 });
 
 app.get('/api/history/:id', requireAuth, async (req, res) => {
+  if (!mongoose.isObjectIdOrHexString(req.params.id)) {
+  return res.status(404).json({ error: 'Scan not found' });
+}
+
   const scan = await Scan.findOne({ _id: req.params.id, userId: req.userId });
   if (!scan) return res.status(404).json({ error: 'Scan not found' });
 
@@ -177,6 +213,7 @@ app.get('/api/history/:id', requireAuth, async (req, res) => {
     scannedAt: scan.scannedAt,
   });
 });
+
 
 app.delete('/api/history/:id', requireAuth, async (req, res) => {
   await Scan.deleteOne({ _id: req.params.id, userId: req.userId });

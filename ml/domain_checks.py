@@ -14,6 +14,7 @@ import tldextract
 BRANDS = {
     "paypal": ["paypal.com"],
     "google": ["google.com", "google.co.in"],
+    "mongodb": ["mongodb.com"],
     "facebook": ["facebook.com"],
     "instagram": ["instagram.com"],
     "whatsapp": ["whatsapp.com"],

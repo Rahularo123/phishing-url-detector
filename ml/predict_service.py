@@ -7,8 +7,10 @@ from domain_checks import get_domain_age_days, check_brand_impersonation, is_off
 app = Flask(__name__)
 
 
-model = joblib.load('phishing_model.joblib')
-model_columns = joblib.load('model_columns.joblib')
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+model = joblib.load(os.path.join(BASE_DIR, 'phishing_model.joblib'))
+model_columns = joblib.load(os.path.join(BASE_DIR, 'model_columns.joblib'))
 
 
 TOP_TLDS = [c.replace('tld_', '', 1) for c in model_columns

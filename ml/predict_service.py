@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import pandas as pd
 import joblib
 from features import extract_features
+from domain_checks import get_domain_age_days, check_brand_impersonation, is_official_domain
 
 app = Flask(__name__)
 
@@ -50,6 +51,37 @@ def generate_flags(feats):
         flags.append({"label": "High number of special characters", "severity": "low"})
     return flags
 
+SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2}
+
+
+def plural(n, word):
+    return f"{n} {word}" if n == 1 else f"{n} {word}s"
+
+
+def apply_domain_checks(url, risk_score, flags):
+    """Second layer on top of the model: brand impersonation + domain age."""
+    if is_official_domain(url):
+        return risk_score, flags
+
+    brand_flag = check_brand_impersonation(url)
+    if brand_flag:
+        flags.append(brand_flag)
+        floor = 85 if brand_flag["severity"] == "high" else 60
+        risk_score = max(risk_score, floor)
+
+    age_days = get_domain_age_days(url)
+    if age_days is not None:
+        if age_days < 30:
+            label = "Domain registered today" if age_days == 0 else f"Domain registered {plural(age_days, 'day')} ago"
+            flags.append({"label": label, "severity": "high"})
+            risk_score = min(risk_score + 20, 100)
+        elif age_days < 180:
+            flags.append({"label": "Domain registered less than 6 months ago", "severity": "medium"})
+            risk_score = min(risk_score + 10, 100)
+
+    flags.sort(key=lambda f: SEVERITY_ORDER[f["severity"]])
+    return risk_score, flags
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -62,9 +94,11 @@ def predict():
     try:
         df_row, feats = prepare_input(url)
 
-       
         probability = model.predict_proba(df_row)[0][1]
         risk_score = round(probability * 100)
+        flags = generate_flags(feats)
+
+        risk_score, flags = apply_domain_checks(url, risk_score, flags)
 
         if risk_score < 40:
             verdict = "Safe"
@@ -72,8 +106,6 @@ def predict():
             verdict = "Suspicious"
         else:
             verdict = "Phishing"
-
-        flags = generate_flags(feats)
 
         return jsonify({
             "riskScore": risk_score,
@@ -83,7 +115,6 @@ def predict():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(port=5002)

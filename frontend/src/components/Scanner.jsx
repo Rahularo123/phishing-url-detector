@@ -25,6 +25,7 @@ export default function Scanner({ onOpenAuth }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [protocolPrompt, setProtocolPrompt] = useState(null);
 
   const handleScan = async (targetUrl = url) => {
     const cleanUrl = targetUrl.trim();
@@ -32,6 +33,13 @@ export default function Scanner({ onOpenAuth }) {
       setError('Please enter a URL to scan');
       return;
     }
+
+    if (!/^https?:\/\//i.test(cleanUrl)) {
+      setProtocolPrompt(cleanUrl);
+      setError('');
+      return;
+    }
+    setProtocolPrompt(null);
 
     if (!isAuthenticated) {
       onOpenAuth();
@@ -53,6 +61,14 @@ export default function Scanner({ onOpenAuth }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSelectProtocol = (scheme) => {
+    if (!protocolPrompt) return;
+    const fullUrl = `${scheme}://${protocolPrompt}`;
+    setUrl(fullUrl);
+    setProtocolPrompt(null);
+    handleScan(fullUrl);
   };
 
   const handleSampleClick = (sampleUrl) => {
@@ -172,6 +188,34 @@ export default function Scanner({ onOpenAuth }) {
             ))}
           </div>
         </div>
+
+                {/* Interactive Protocol Choice Prompt */}
+        {protocolPrompt && (
+          <div className="protocol-choice-box">
+            <div className="protocol-choice-header">
+              <Shield size={16} />
+              <span>Protocol not specified. Which version would you like to inspect?</span>
+            </div>
+            <div className="protocol-choice-buttons">
+              <button
+                type="button"
+                className="protocol-btn https"
+                onClick={() => handleSelectProtocol('https')}
+              >
+                <Lock size={14} />
+                <span>HTTPS (Secure): <strong>https://{protocolPrompt}</strong></span>
+              </button>
+              <button
+                type="button"
+                className="protocol-btn http"
+                onClick={() => handleSelectProtocol('http')}
+              >
+                <AlertTriangle size={14} />
+                <span>HTTP (Unencrypted): <strong>http://{protocolPrompt}</strong></span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="scan-error-alert">
